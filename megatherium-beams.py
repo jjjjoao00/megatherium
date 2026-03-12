@@ -11,29 +11,24 @@ import os
 import platform
 
 #print(ifcopenshell.version)
-
-model = ifcopenshell.open('C:/Users/Dell/Desktop/DOCS/EXTRACAO-IFC/modeloviga3.ifc')
+#instancia o modelo
+model = ifcopenshell.open('C:/Users/Dell/Desktop/DOCS/EXTRACAO-IFC/modeloviga2.ifc')
 
 #print(model.schema)
 
 #print(model.by_guid('3BQMEDNX51sv31xQw3nvH$'))
-
+#VIGAS
 beams = model.by_type('IfcBeam')[0]
 beam_type = ifcopenshell.util.element.get_type(beams)
-psets = ifcopenshell.util.element.get_psets(beams)
-
-pset_and_qtos = ifcopenshell.util.element.get_pset(beams, 'Pset_BeamCommon')
-
 tampa_z = []
-lateral_y = []
-base_x = []
-
+lateral_x = []
+base_y = []
 total_tampa_z = 0
-total_base_x = 0
-total_lateral_y = 0
-
+total_base_y = 0
+total_lateral_x = 0
 total_faces = 0
 
+#INICIALIZAÇÃO AUTOMATICA DO EXCEL
 diretorio_script = os.path.dirname(os.path.abspath(__file__))
 nome_arquivo = 'formas.csv'
 caminho_final = os.path.join(diretorio_script, nome_arquivo)
@@ -50,19 +45,19 @@ for viga in model.by_type('IfcBeam', 1):
 	settings = ifcopenshell.geom.settings()
 	shape = ifcopenshell.geom.create_shape(settings, viga)
 
-		#RETORNA O VOLUME DA VIGA
+		#RETORNA O VOLUME DE CADA VIGA
 	volume = round (ifcopenshell.util.shape.get_volume(shape.geometry), 2)
 	print (f'Volume de concreto: {volume} m3')
 
 		#VERIFICAÇÃO DAS MEDIDAS EM CADA EIXO
 
 		#RETORNA A DIMENSÃO EM X
-	facesx = round (ifcopenshell.util.shape.get_x(shape.geometry) ,2)
-	print (f'face x: {facesx:.2f}' )
+	facesy = round (ifcopenshell.util.shape.get_x(shape.geometry) ,2)
+	print (f'face x: {facesy:.2f}' )
 
 		#RETORNA A DIMENSÃO EM Y
-	facesy = round (ifcopenshell.util.shape.get_y(shape.geometry), 2)
-	print(f'face y: {facesy:.2f}')
+	facesx = round (ifcopenshell.util.shape.get_y(shape.geometry), 2)
+	print(f'face y: {facesx:.2f}')
 
 		#RETORNA A DIMENSÃO EM Z
 	facesz = round (ifcopenshell.util.shape.get_z(shape.geometry), 2)
@@ -74,25 +69,25 @@ for viga in model.by_type('IfcBeam', 1):
 	print (f'Area da tampa (Z da tampa) : {area_tampa:.2f} m2')
 
 		#CALCULA A AREA DE SUPERFICIE LATERAL
-	area_lateral= round ((ifcopenshell.util.shape.get_side_area(shape.geometry, 'X', angle = 90.0)*2), 2)
-	print (f'Area lateral (Y da face): {area_lateral:.2f} m2')
+	area_lateral= round ((ifcopenshell.util.shape.get_side_area(shape.geometry, 'Y', angle = 90.0)), 2)
+	print (f'Area da base (Y da base): {area_lateral:.2f} m2')
 
 		#CALCULA A AREA DE SUPERFICIE BASE
-	area_base= round (ifcopenshell.util.shape.get_side_area(shape.geometry, 'Y', angle = 90.0) ,2)
-	print (f'Area da base (X da base): {area_base:.2f} m2')
+	area_base= round ((ifcopenshell.util.shape.get_side_area(shape.geometry, 'X', angle = 90.0)*2) ,2)
+	print (f'Area da lateral (X da face): {area_base:.2f} m2')
 
 
 		#CRIA UMA LISTA COM AS QUANTIDADES CALCULADAS EM M2
 	tampa_z.append(area_tampa)
-	base_x.append(area_base)
-	lateral_y.append(area_lateral)
+	base_y.append(area_base)
+	lateral_x.append(area_lateral)
 
 		#SOMA OS VALORES DAS LISTAS DAS QUANTIDADES E RETORNA A QUANTIDADE TOTAL EM M2
 	total_tampa_z = sum(tampa_z)
-	total_base_x = sum(base_x)
-	total_lateral_y = sum(lateral_y)
+	total_base_y = sum(base_y)
+	total_lateral_x = sum(lateral_x)
 
-	total_faces = total_tampa_z + total_base_x + total_lateral_y
+	total_faces = total_tampa_z + total_base_y + total_lateral_x
 
 
 
@@ -153,8 +148,19 @@ else: #linux
 
 
 
-#TODO
-#EXPORTAR EM CSV
+#TODO#
+
+#INSERIR PILARES
+
+#VERSAO FINAL
+# Leitura e parse de arquivos IFC (IFC2X3 e IFC4) ok
+#Identificação automática de pilares e vigas no modelo ok
+#Cálculo preciso da área de fôrma para cada elemento ok
+#Suporte a diferentes geometrias e seções transversais
+#Relatórios detalhados em formato CSV e Excel
+#Agrupamento por pavimento/tipo de elemento
+#Filtros personalizáveis por critérios específicos
+#Validação de geometrias e tratamento de interseções
 
 
 
@@ -163,7 +169,7 @@ else: #linux
 
 
 #conta quantos tipos tem no arquivo
-print (f'Total de trechos', len(beam_type))
+print (f'Total de trechos de viga no modelo', len(beam_type))
 
 #print (ifcopenshell.util.element.get_psets(beams))
 #print(beams.IsDefinedBy)
