@@ -16,7 +16,7 @@ Este projeto visa automatizar o processo de extração de quantitativos de forma
 - Cálculo preciso da área de fôrma para cada elemento ✅
 - Relatórios detalhados em formato CSV e Excel ✅
 - Agrupamento por pavimento/tipo de elemento
-- Criar uma interface
+- Interface intuitiva
 
 ## 🚀 Tecnologias Utilizadas
 
