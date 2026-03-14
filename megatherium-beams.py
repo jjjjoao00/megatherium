@@ -10,19 +10,16 @@ import csv
 import os 
 import platform
 
-#print(ifcopenshell.version)
 #instancia o modelo
-model = ifcopenshell.open('C:/Users/Dell/Desktop/DOCS/EXTRACAO-IFC/modeloviga2.ifc')
+model = ifcopenshell.open('C:/Users/Dell/Desktop/DOCS/EXTRACAO-IFC/modeloviga3.ifc')
 
-#print(model.schema)
-
-#print(model.by_guid('3BQMEDNX51sv31xQw3nvH$'))
 #VIGAS
 beams = model.by_type('IfcBeam')[0]
 beam_type = ifcopenshell.util.element.get_type(beams)
 tampa_z = []
 lateral_x = []
 base_y = []
+id_beams = []
 total_tampa_z = 0
 total_base_y = 0
 total_lateral_x = 0
@@ -39,9 +36,8 @@ for viga in model.by_type('IfcBeam', 1):
 	#NOMEIA CADA VIGA A PARTIR DA ESPECIFIAÇÃO TAG NO PROJETO
 	print(viga.Tag)
 	
-	#ESPECIFICA UMA VIGA PARA ESTUDO A PARTIR DO GLOBALID
-	#if viga.GlobalId == '2H1oP3Na99ygsjqS8bEEXR':
-		#RETORNA A FORMA GEOMÉTRICA DA VIGA ESTUDADA
+
+	#RETORNA A FORMA GEOMÉTRICA DA VIGA ESTUDADA
 	settings = ifcopenshell.geom.settings()
 	shape = ifcopenshell.geom.create_shape(settings, viga)
 
@@ -76,7 +72,6 @@ for viga in model.by_type('IfcBeam', 1):
 	area_base= round ((ifcopenshell.util.shape.get_side_area(shape.geometry, 'X', angle = 90.0)*2) ,2)
 	print (f'Area da lateral (X da face): {area_base:.2f} m2')
 
-
 		#CRIA UMA LISTA COM AS QUANTIDADES CALCULADAS EM M2
 	tampa_z.append(area_tampa)
 	base_y.append(area_base)
@@ -89,6 +84,15 @@ for viga in model.by_type('IfcBeam', 1):
 
 	total_faces = total_tampa_z + total_base_y + total_lateral_x
 
+	#CRIA A LISTA DE ID DAS VIGAS
+	id_beams.append(viga.Tag)
+
+
+
+
+
+# Adicione isso para ver como os dados estão chegando no Python
+print(f"DEBUG - Dados da linha: {lateral_x}"f'{base_y}'f'{tampa_z}')
 
 
 #CRIA O CSV
@@ -97,12 +101,16 @@ with open ('formas.csv', mode = 'w', newline = '', encoding ='utf-8') as arquivo
 	escritor = csv.writer (arquivo, delimiter =';')
 
 	#CABEÇALHO
-	escritor.writerow (['NOME', 'TOTAL M2'])
+	escritor.writerow (['ID', 'TOTAL X (M2)', 'TOTAL Y (M2)', 'TOTAL Z (M2)'])
+
+	#NOMEIA AS VIGAS A PARTIR DA TAG
+	for desc, dim_x, dim_y, dim_z in zip (id_beams, lateral_x, base_y, tampa_z):
+		escritor.writerow([desc, f'{dim_x}', f'{dim_y}', f'{dim_z}'])
 
 
 	#LINHA EM BRANCO E TOTAL
 	escritor.writerow([])
-	escritor.writerow(['Total de formas para as vigas', f'{total_faces} M2'])	
+	escritor.writerow(['Total de formas para as vigas', ' ',f'{total_faces} M2'])	
 
 
 
@@ -120,59 +128,20 @@ else: #linux
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#print (tampa_z)
-#print (base_y)
-#print (lateral_x)
-
-#print(f'Total de material para formas na área da tampa: {total_tampa_z:.2f} m2')
-#print(f'Total de material para formas na área da base: {total_base_x:.2f} m2')
-#print(f'Total de material para formas na área das faces laterais: {total_lateral_y:.2f} m2')
-
-#print(total_faces)
-
-
-
-
 #TODO#
 
-#INSERIR PILARES
+#GERAR UM DICIONÁRIO QUE CLASSIFICA OS ELEMENTOS PELA TAG ok
+#CRIAR UMA INTERFACE SIMPLES
+#PASSAR PARA A VERSÃO FINAL
+
 
 #VERSAO FINAL
 # Leitura e parse de arquivos IFC (IFC2X3 e IFC4) ok
 #Identificação automática de pilares e vigas no modelo ok
 #Cálculo preciso da área de fôrma para cada elemento ok
-#Suporte a diferentes geometrias e seções transversais
-#Relatórios detalhados em formato CSV e Excel
-#Agrupamento por pavimento/tipo de elemento
+#Relatórios detalhados em formato CSV e Excel OK
+#Agrupamento por pavimento/tipo de elemento 
 #Filtros personalizáveis por critérios específicos
 #Validação de geometrias e tratamento de interseções
 
-
-
-#print (beams.GlobalId)
-#print (beams.Name)
-
-
-#conta quantos tipos tem no arquivo
-print (f'Total de trechos de viga no modelo', len(beam_type))
-
-#print (ifcopenshell.util.element.get_psets(beams))
-#print(beams.IsDefinedBy)
-
-#print(beams)
 
