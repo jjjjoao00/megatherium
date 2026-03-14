@@ -9,16 +9,14 @@ Ferramenta em Python para extração automatizada de quantitativos de formas (á
 
 Este projeto visa automatizar o processo de extração de quantitativos de formas para elementos estruturais de concreto armado (pilares e vigas) diretamente de modelos BIM no formato IFC. A ferramenta calcula automaticamente as áreas de fôrma necessárias para execução desses elementos, gerando relatórios detalhados para orçamento e planejamento de obras.
 
-### 🎯 Funcionalidades
+### 🎯 TODO
 
-- Leitura e parse de arquivos IFC (IFC2X3 e IFC4)
-- Identificação automática de pilares e vigas no modelo
-- Cálculo preciso da área de fôrma para cada elemento
-- Suporte a diferentes geometrias e seções transversais
-- Relatórios detalhados em formato CSV e Excel
+- Leitura e parse de arquivos IFC (IFC2X3 e IFC4) ✅
+- Identificação automática de pilares e vigas no modelo ✅
+- Cálculo preciso da área de fôrma para cada elemento ✅
+- Relatórios detalhados em formato CSV e Excel ✅
 - Agrupamento por pavimento/tipo de elemento
-- Filtros personalizáveis por critérios específicos
-- Validação de geometrias e tratamento de interseções
+- Criar uma interface
 
 ## 🚀 Tecnologias Utilizadas
 
