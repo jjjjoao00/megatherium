@@ -10,7 +10,7 @@ import csv
 import os 
 import platform
 from pathlib import Path
-
+import re
 model = ifcopenshell.open('C:/Users/Dell/Desktop/DOCS/EXTRACAO-IFC/modelopilar2.ifc')
 
 #PILARES
@@ -90,8 +90,10 @@ with open ('formas.csv', mode = 'w', newline = '', encoding ='utf-8') as arquivo
 	#CABEÇALHO
 	escritor.writerow (['ID', 'TOTAL X (M2)', 'TOTAL Y (M2)'])
 
+	id_columns_ordenados = sorted(id_columns, key=lambda x: int(re.search(r'\d+',x).group()))
+
 	#NOMEIA OS PILARES A PARTIR DA TAG
-	for desc, dim_x, dim_y in zip(id_columns, lado_x, lado_y):
+	for desc, dim_x, dim_y in zip(id_columns_ordenados, lado_x, lado_y):
 		escritor.writerow([desc, f'{dim_x}', f'{dim_y}'])
 
 		

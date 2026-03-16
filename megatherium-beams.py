@@ -9,6 +9,7 @@ import math
 import csv
 import os 
 import platform
+import re
 
 #instancia o modelo
 model = ifcopenshell.open('C:/Users/Dell/Desktop/DOCS/EXTRACAO-IFC/modeloviga3.ifc')
@@ -20,10 +21,13 @@ tampa_z = []
 lateral_x = []
 base_y = []
 id_beams = []
+id_beams_ordenado = sorted(id_beams, key=lambda x: int(re.search(r'\d+', x ).group()))
 total_tampa_z = 0
 total_base_y = 0
 total_lateral_x = 0
 total_faces = 0
+
+dados = []
 
 #INICIALIZAÇÃO AUTOMATICA DO EXCEL
 diretorio_script = os.path.dirname(os.path.abspath(__file__))
@@ -35,7 +39,6 @@ caminho_final = os.path.join(diretorio_script, nome_arquivo)
 for viga in model.by_type('IfcBeam', 1):
 	#NOMEIA CADA VIGA A PARTIR DA ESPECIFIAÇÃO TAG NO PROJETO
 	print(viga.Tag)
-	
 
 	#RETORNA A FORMA GEOMÉTRICA DA VIGA ESTUDADA
 	settings = ifcopenshell.geom.settings()
@@ -92,19 +95,25 @@ for viga in model.by_type('IfcBeam', 1):
 
 
 # Adicione isso para ver como os dados estão chegando no Python
-print(f"DEBUG - Dados da linha: {lateral_x}"f'{base_y}'f'{tampa_z}')
+#print(f"DEBUG - Dados da linha: {lateral_x}"f'{base_y}'f'{tampa_z}')
+print(id_beams)
 
 
 #CRIA O CSV
 with open ('formas.csv', mode = 'w', newline = '', encoding ='utf-8') as arquivo:
 	#CRIA O OBJETO QUE VAI SER O CSV
 	escritor = csv.writer (arquivo, delimiter =';')
+	leitor = csv.DictReader (arquivo)
+	coluna_alvo = 'ID'
 
 	#CABEÇALHO
 	escritor.writerow (['ID', 'TOTAL X (M2)', 'TOTAL Y (M2)', 'TOTAL Z (M2)'])
 
+
+	id_beams_ordenados = sorted(id_beams, key=lambda x: int(re.search(r'\d+',x).group()))
+
 	#NOMEIA AS VIGAS A PARTIR DA TAG
-	for desc, dim_x, dim_y, dim_z in zip (id_beams, lateral_x, base_y, tampa_z):
+	for desc, dim_x, dim_y, dim_z in zip (id_beams_ordenados, lateral_x, base_y, tampa_z):
 		escritor.writerow([desc, f'{dim_x}', f'{dim_y}', f'{dim_z}'])
 
 
@@ -112,6 +121,7 @@ with open ('formas.csv', mode = 'w', newline = '', encoding ='utf-8') as arquivo
 	escritor.writerow([])
 	escritor.writerow(['Total de formas para as vigas', ' ',f'{total_faces} M2'])	
 
+	
 
 
 print(f"Arquivo '{caminho_final}' criado!")
@@ -129,8 +139,6 @@ else: #linux
 
 
 #TODO#
-
-#GERAR UM DICIONÁRIO QUE CLASSIFICA OS ELEMENTOS PELA TAG ok
 #CRIAR UMA INTERFACE SIMPLES
 #PASSAR PARA A VERSÃO FINAL
 
@@ -141,7 +149,7 @@ else: #linux
 #Cálculo preciso da área de fôrma para cada elemento ok
 #Relatórios detalhados em formato CSV e Excel OK
 #Agrupamento por pavimento/tipo de elemento 
-#Filtros personalizáveis por critérios específicos
-#Validação de geometrias e tratamento de interseções
+
+
 
 
